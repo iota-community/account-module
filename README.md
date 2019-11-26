@@ -6,7 +6,7 @@ This repository contains the sample code that we use on the [IOTA documentation 
 
 To get started you need [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed on your device.
 
-If you don't have a Go development environment or if this is your first time using the Go client library, complete our [getting started guide]().
+If you don't have a Go development environment or if this is your first time using the Go client library, complete our [getting started guide](https://docs.iota.org/docs/client-libraries/0.1/getting-started/go-quickstart).
 
 ## Getting started
 
