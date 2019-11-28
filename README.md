@@ -1,24 +1,13 @@
+# IOTA samples
 
-# Account module sample code in Go
+Sample code that we use on the IOTA documentation portal.
 
-This repository contains the sample code that we use on the [IOTA documentation portal](https://docs.iota.org) to help you get started with the Go account module.
-
-## Prerequisites
-
-To get started you need [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed on your device.
-
-If you don't have a Go development environment or if this is your first time using the Go client library, complete our [getting started guide](https://docs.iota.org/docs/client-libraries/0.1/getting-started/go-quickstart).
+Use this repository to try sample code and learn how to use IOTA technology with the accompanying [documention](https://docs.iota.org).
 
 ## Getting started
 
-To start playing with these examples run the following commands:
+1. Choose one of the available programming language directories
+2. Find a project that you want to try
+3. Follow the README to get started
 
-```bash
-git clone https://github.com/JakeSCahill/getting-started-go-accounts.git
-cd getting-started-go-accounts
-go mod download
-go run create-account/create-account.go
-```
-You should see the balance of your new account.
-
-You'll also have a database file that keeps track of your seed state.
+All the README files have information on getting started and links to the documentation portal for complete guides.

@@ -3,10 +3,12 @@ package main
 import (
 	"fmt"
 	"github.com/iotaledger/iota.go/account/builder"
+	"github.com/iotaledger/iota.go/account/deposit"
 	"github.com/iotaledger/iota.go/account/store/badger"
 	"github.com/iotaledger/iota.go/account/timesrc"
 	"github.com/iotaledger/iota.go/api"
 	"github.com/iotaledger/iota.go/trinary"
+	"time"
 )
 
 // You should never hard-code a seed
@@ -19,7 +21,7 @@ func main() {
 	iotaAPI, err := api.ComposeAPI(apiSettings)
 	handleErr(err)
 
-	store, err := badger.NewBadgerStore("db")
+	store, err := badger.NewBadgerStore("seed-state-database")
 	handleErr(err)
 
 	// Make sure the database closes when the code stops
@@ -46,10 +48,22 @@ func main() {
 	// Make sure the account shuts down when the code stops
 	defer account.Shutdown()
 
-	balance, err := account.AvailableBalance()
+	// Get the current time
+	now, err := timesource.Time()
 	handleErr(err)
-	fmt.Println("Total available balance: ")
-	fmt.Println(balance)
+
+	// Define the same time tomorrow
+	now = now.Add(time.Duration(24) * time.Hour)
+
+	// Specify the conditions
+	conditions := &deposit.Conditions{TimeoutAt: &now, MultiUse: true}
+
+	// Generate the CDA
+	cda, err := account.AllocateDepositAddress(conditions)
+	handleErr(err)
+
+	fmt.Println(cda.AsMagnetLink())
+
 }
 
 func handleErr(err error) {

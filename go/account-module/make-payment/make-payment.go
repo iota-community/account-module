@@ -25,7 +25,7 @@ func main() {
 	handleErr(err)
 	fmt.Println("Connected to a Devnet node: " + nodeInfo.AppName)
 
-	store, err := badger.NewBadgerStore("db")
+	store, err := badger.NewBadgerStore("seed-state-database")
 	handleErr(err)
 
 	// Make sure the database closes when the code stops

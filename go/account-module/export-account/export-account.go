@@ -1,15 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
+	//Store "github.com/iotaledger/iota.go/account/store"
 	"github.com/iotaledger/iota.go/account/builder"
-	"github.com/iotaledger/iota.go/account/deposit"
-	"github.com/iotaledger/iota.go/account/oracle"
-	oracle_time "github.com/iotaledger/iota.go/account/oracle/time"
 	"github.com/iotaledger/iota.go/account/store/badger"
 	"github.com/iotaledger/iota.go/account/timesrc"
 	"github.com/iotaledger/iota.go/api"
-	"time"
 )
 
 // You should never hard-code a seed
@@ -25,17 +24,17 @@ func main() {
 	handleErr(err)
 	fmt.Println("Connected to a Devnet node: " + nodeInfo.AppName)
 
-	store, err := badger.NewBadgerStore("db")
+	store, err := badger.NewBadgerStore("seed-state-database")
 	handleErr(err)
 
 	// Make sure the database closes when the code stops
 	defer store.Close()
 
-	// create an accurate time source (in this case Google's NTP server).
+	// Create an accurate time source (in this case Google's NTP server).
 	timesource := timesrc.NewNTPTimeSource("time.google.com")
 
 	account, err := builder.NewBuilder().
-		// Connect to the node
+		// Connect to a node
 		WithAPI(iotaAPI).
 		// Create the database
 		WithStore(store).
@@ -53,42 +52,52 @@ func main() {
 	// Make sure the account shuts down when the code stops
 	defer account.Shutdown()
 
-	// Get the current time
-	now, err := timesource.Time()
+	f, err := os.OpenFile("exported-seed-state.json", os.O_CREATE, 0755)
 	handleErr(err)
 
-	now = now.Add(time.Duration(24) * time.Hour)
+	// Make sure the file closes when the code stops
+	defer f.Close()
 
-	amount, err := account.AvailableBalance()
+	ID := account.ID()
+
+	// Export the seed state
+	acc, err := store.ExportAccount(ID)
 	handleErr(err)
 
-	// Specify the conditions
-	conditions := &deposit.Conditions{TimeoutAt: &now, MultiUse: false, ExpectedAmount: &amount}
-
-	// Generate CDA
-	cda, err := account.AllocateDepositAddress(conditions)
+	// Serialize the seed state as JSON
+	jsonacc, err := json.Marshal(acc)
 	handleErr(err)
 
-	// Set the oracle's threshold to 30 minutes
-	threshold := time.Duration(30) * time.Minute
-	// Create the oracle
-	timeDecider := oracle_time.NewTimeDecider(timesource, threshold)
-	// Create a n instance of the oracle
-	sendOracle := oracle.New(timeDecider)
+	// Write the seed state to the JSON file
+	f.Write(jsonacc)
+	f.Close()
 
-	// Ask the oracle if the CDA is OK to send to
-	ok, rejectionInfo, err := sendOracle.OkToSend(cda)
-	handleErr(err)
-	if !ok {
-		fmt.Println("Won't send transaction: ", rejectionInfo)
-		return
-	}
+	fmt.Println("Seed state exported")
 
-	// Create and send the bundle
-	bundle, err := account.Send(cda.AsTransfer())
+	/* Import code:
+	Before you uncomment this code, comment out the export code
+	and uncomment the 'Store' package import
+
+	file, err := os.Open("exported-seed-state.json")
 	handleErr(err)
 
-	fmt.Printf("Sent deposit to %s in the bundle with the following tail transaction hash %s\n", cda.Address, bundle[0].Hash)
+	defer file.Close()
+
+	fileinfo, err := file.Stat()
+	handleErr(err)
+
+	filesize := fileinfo.Size()
+	buffer := make([]byte, filesize)
+
+	jsonSeedState, err := file.Read(buffer)
+	handleErr(err)
+
+	a := Store.ExportedAccountState{}
+	err = json.Unmarshal(jsonSeedState, &a)
+		handleErr(err)
+
+	store.ImportAccount(a)
+	*/
 
 }
 

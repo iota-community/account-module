@@ -20,7 +20,7 @@ func main() {
 	iotaAPI, err := api.ComposeAPI(apiSettings)
 	handleErr(err)
 
-	store, err := badger.NewBadgerStore("db")
+	store, err := badger.NewBadgerStore("seed-state-database")
 	handleErr(err)
 
 	// Make sure the database closes when the code stops

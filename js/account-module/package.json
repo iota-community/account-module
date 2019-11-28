@@ -1,0 +1,32 @@
+{
+  "name": "account-module",
+  "version": "1.0.0",
+  "description": "Sample code to get started with the IOTA account module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JakeSCahill/iota-samples.git"
+  },
+  "keywords": [
+    "iota",
+    "account",
+    "module",
+    "seed",
+    "state"
+  ],
+  "author": "Jake Cahill",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JakeSCahill/iota-samples/issues"
+  },
+  "homepage": "https://github.com/JakeSCahill/iota-samples#readme",
+  "dependencies": {
+    "@iota/account": "^1.0.0-beta.23",
+    "@iota/cda": "^1.0.0-beta.23",
+    "@iota/transaction-converter": "^1.0.0-beta.23",
+    "ntp-client": "^0.5.3"
+  }
+}
