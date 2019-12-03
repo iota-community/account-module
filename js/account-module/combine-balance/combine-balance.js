@@ -20,8 +20,6 @@ const delay = 1000 * 30;
 // Those transactions are automatically re-attached
 const maxDepth = 6;
 
-const timeSource = ntpClient.getNetworkTime("time.google.com");
-
 // Create a new account
 const account = createAccount({
     seed,
@@ -32,9 +30,6 @@ const account = createAccount({
     maxDepth,
     timeSource
 });
-
-// Start the plugins
-account.start();
 
 account.getAvailableBalance()
     .then(balance => {
