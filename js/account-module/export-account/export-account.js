@@ -1,7 +1,8 @@
 const { createAccount }  = require('@iota/account');
 const fs = require('fs');
 const ntpClient = require('ntp-client');
-
+const util = require('util);
+		     
 const seed = 'PUEOTSEITFEVEWCWBTSIZM9NKRGJEIMXTULBACGFRQK9IMGICLBKW9TTEVSDQMGWKBXPVCBMMCXWMNPDX';
 
 // The node to connect to
@@ -20,7 +21,7 @@ const delay = 1000 * 30;
 // Those transactions are automatically re-attached
 const maxDepth = 6;
 
-const timeSource = ntpClient.getNetworkTime("time.google.com");
+const timeSource = () => util.promisify(ntpClient.getNetworkTime)("time.google.com");
 
 // Create a new account
 const account = createAccount({
@@ -33,22 +34,18 @@ const account = createAccount({
     timeSource
 });
 
-// Start the plugins
-account.start();
-
-
 account.exportState().then(state => {
     let JSONstate = JSON.stringify(state);
     fs.writeFile('exported-seed-state.json', JSONstate,
     function(err, result) {
         if (err) {
-			console.log('error', err);
-			// Close the database and stop any ongoing reattachments
+	    console.log('error', err);
+	    // Close the database and stop any ongoing reattachments
             account.stop();
         } else {
             console.log('Seed state saved')
         }
-	});
+    });
 });
 
 /* Import code:
@@ -56,17 +53,15 @@ Before you uncomment this code, comment out the export code
 
 let JSONSeedState = fs.readFileSync("exported-seed-state.json");
 
-let importedState = JSON.parse(JSONSeedState);
+let state = JSON.parse(JSONSeedState);
 
-account.importState(importedState).then(err => {
-	if (err) {
-		console.log('error', err);
-		// Close the database and stop any ongoing reattachments
+account.importState(state).then(err => {
+    if (err) {
+        console.log('error', err);
+        // Close the database and stop any ongoing reattachments
         account.stop();
-	} else {
-		console.log('Seed state imported')
-	}
+    } else {
+        console.log('Seed state imported')
+    }
 });
 */
-
-
