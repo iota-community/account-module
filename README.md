@@ -11,3 +11,7 @@ Use this repository to try sample code and learn how to use IOTA technology with
 3. Follow the README to get started
 
 All the README files have information on getting started and links to the documentation portal for complete guides.
+
+mvn clean install
+mvn compile
+mvn exec:java -D"exec.mainClass"="com.iota.ConnectToNode"
