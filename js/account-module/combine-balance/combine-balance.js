@@ -13,11 +13,11 @@ const depth = 3;
 // The minimum weight magnitude is 9 on the Devnet
 const minWeightMagnitude = 9;
 
-// How long to wait before the next attachment round
+// How long to wait between each reattachment round
 const delay = 1000 * 30;
 
 // The depth at which transactions are no longer promotable
-// Those transactions are automatically re-attached
+// and should be reattached
 const maxDepth = 6;
 
 // Create a new account

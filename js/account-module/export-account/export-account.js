@@ -1,7 +1,7 @@
 const { createAccount }  = require('@iota/account');
 const fs = require('fs');
 const ntpClient = require('ntp-client');
-const util = require('util);
+const util = require('util');
 		     
 const seed = 'PUEOTSEITFEVEWCWBTSIZM9NKRGJEIMXTULBACGFRQK9IMGICLBKW9TTEVSDQMGWKBXPVCBMMCXWMNPDX';
 
@@ -14,14 +14,14 @@ const depth = 3;
 // The minimum weight magnitude is 9 on the Devnet
 const minWeightMagnitude = 9;
 
-// How long to wait before the next attachment round
+// How long to wait between each reattachment round
 const delay = 1000 * 30;
 
 // The depth at which transactions are no longer promotable
-// Those transactions are automatically re-attached
+// and should be reattached
 const maxDepth = 6;
 
-const timeSource = () => util.promisify(ntpClient.getNetworkTime)("time.google.com");
+const timeSource = () => util.promisify(ntpClient.getNetworkTime)("time.google.com", 123);
 
 // Create a new account
 const account = createAccount({
