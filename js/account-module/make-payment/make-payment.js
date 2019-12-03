@@ -2,6 +2,7 @@ const { createAccount }  = require('@iota/account');
 const CDA = require('@iota/cda');
 const TransactionConverter  = require('@iota/transaction-converter');
 const ntpClient = require('ntp-client');
+const util = require('util');
 
 const seed = 'PUEOTSEITFEVEWCWBTSIZM9NKRGJEIMXTULBACGFRQK9IMGICLBKW9TTEVSDQMGWKBXPVCBMMCXWMNPDX';
 
@@ -21,7 +22,7 @@ const delay = 1000 * 30;
 // Those transactions are automatically re-attached
 const maxDepth = 6;
 
-const timeSource = ntpClient.getNetworkTime("time.google.com");
+const timeSource = () => util.promisify(ntpClient.getNetworkTime)("time.google.com");
 
 // Create a new account
 const account = createAccount({
@@ -33,9 +34,6 @@ const account = createAccount({
     maxDepth,
     timeSource
 });
-
-// Start the plugins
-account.start();
 
 // Define the CDA to send the payment to
 const magnetLink = "iota://BWNYWGULIIAVRYOOFWZTSDFXFPRCFF9YEHGVBOORLGCPCJSKTHU9OKESUGZGWZXZZDLESFPPTGEHVKTTXG9BQLSIGP/?timeout_at=5174418337&multi_use=1&expected_amount=0";
@@ -60,7 +58,7 @@ ntpClient.getNetworkTime("time.google.com", 123, function(err, date) {
 if (isActive) {
     account.sendToCDA({
         ...cda,
-        value: 1000
+        value: 1
     })
     .then((trytes) => {
         // Get the tail transaction and convert it to an object

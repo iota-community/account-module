@@ -1,6 +1,7 @@
 const { createAccount }  = require('@iota/account');
 const CDA = require('@iota/cda');
 const ntpClient = require('ntp-client');
+const util = require('util');
 
 const seed = 'PUEOTSEITFEVEWCWBTSIZM9NKRGJEIMXTULBACGFRQK9IMGICLBKW9TTEVSDQMGWKBXPVCBMMCXWMNPDX';
 
@@ -20,7 +21,7 @@ const delay = 1000 * 30;
 // Those transactions are automatically re-attached
 const maxDepth = 6;
 
-const timeSource = ntpClient.getNetworkTime("time.google.com");
+const timeSource = () => util.promisify(ntpClient.getNetworkTime)("time.google.com");
 
 // Create a new account
 const account = createAccount({
@@ -33,11 +34,9 @@ const account = createAccount({
     timeSource
 });
 
-// Start the plugins
-account.start();
-
-account.generateCDA({
-    timeoutAt: Date.now() + 24 * 60 * 60 * 1000
+timeSource().then((time => account.generateCDA({
+        // Set this CDA to expire tomorrow
+        timeoutAt: time + 24 * 60 * 60 * 1000,
     }).then(cda => {
         const magnetLink = CDA.serializeCDAMagnet(cda);
         console.log(magnetLink);
