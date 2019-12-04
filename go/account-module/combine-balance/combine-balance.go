@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-// You should never hard-code a seed
+// The seed that the account uses to generate CDAs and send bundles
 var seed = "PUETTSEITFEVEWCWBTSIZM9NKRGJEIMXTULBACGFRQK9IMGICLBKW9TTEVSDQMGWKBXPVCBMMCXWMNPDX"
 
 func main() {
@@ -25,13 +25,14 @@ func main() {
 	handleErr(err)
 	fmt.Println("Connected to a Devnet node: " + nodeInfo.AppName)
 
+	// Define a database in which to store the seed state
 	store, err := badger.NewBadgerStore("seed-state-database")
 	handleErr(err)
 
 	// Make sure the database closes when the code stops
 	defer store.Close()
 
-	// create an accurate time source (in this case Google's NTP server).
+	// Use the Google NTP servers as a reliable source of time to check CDA timeouts
 	timesource := timesrc.NewNTPTimeSource("time.google.com")
 
 	account, err := builder.NewBuilder().
@@ -88,7 +89,7 @@ func main() {
 	bundle, err := account.Send(cda.AsTransfer())
 	handleErr(err)
 
-	fmt.Printf("Sent deposit to %s in the bundle with the following tail transaction hash %s\n", cda.Address, bundle[0].Hash)
+	fmt.Printf("Sent deposit to %s in the bundle with the following tail transaction hash %s\n", cda.Address, bundle[len(bundle)-1].Hash)
 
 }
 
