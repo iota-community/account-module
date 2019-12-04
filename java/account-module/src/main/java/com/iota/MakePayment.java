@@ -12,7 +12,6 @@ import org.iota.jota.model.Bundle;
 import java.io.File;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 class MakePayment {
     public static void main(String[] args) throws ArgumentException, InterruptedException, ExecutionException {
@@ -24,29 +23,38 @@ class MakePayment {
         .port(443)
         .build();
 
+    // The seed that the account uses to generate CDAs and send bundles
     String mySeed = "PUEOTSEITFEVEWCWBTSIZM9NKRGJEIMXTULBACGFRQK9IMGICLBKW9TTEVSDQMGWKBXPVCBMMCXWMNPDX";
+    
+    // Create a file to store the seed state
     File file = new File("seed-state-database.json");
     AccountStore store = new AccountFileStore(file);
-
+    
+    // Create an account
     IotaAccount account = new IotaAccount.Builder(mySeed)
     .store(store)
     .api(api)
     .build();
 
+    // Start the account and any plugins
     account.start();
 
-    String magnet = "iota://BWNYWGULIIAVRYOOFWZTSDFXFPRCFF9YEHGVBOORLGCPCJSKTHU9OKESUGZGWZXZZDLESFPPTGEHVKTTXG9BQLSIGP/?timeout_at=5174418337&multi_use=1&expected_amount=0";
+    // Define the CDA to send the payment to
+    String magnet = "iota://LQHETLMIBUEGAHMHMIQFBOMSSF9BF9FHOFWAFGDLND9CMBDXOPLBDPMXHBEGZSFFDYVHSXEXCBYVDXKQYXOWVOCRYB/?timeout_at=1575452386589&multi_use=true&expected_amount=0";
 
     ConditionalDepositAddress cda = DepositFactory.get().parse(magnet, MagnetMethod.class);
 
-    Future<Bundle> bundle = account.send(
-            cda.getDepositAddress().getHashCheckSum(),
-            cda.getRequest().getExpectedAmount(),
-            Optional.of("Thanks for that pizza!"), Optional.of("OMNOMNOM"));
-    bundle.get();
+    // Send the bundle
+    Bundle bundle = account.send(
+        cda.getDepositAddress().getHashCheckSum(), 
+        cda.getRequest().getExpectedAmount(), 
+        Optional.of("Thanks for the pizza"),
+        Optional.of("ACCOUNTMODULETEST")).get();
 
-    System.out.println(bundle);
+    System.out.printf("Sent deposit to %s in the bundle with the following tail transaction hash %s\n",
+    bundle.getTransactions().get(bundle.getLength() - 1).getAddress(), bundle.getTransactions().get(bundle.getLength() - 1).getHash());
     
+    // Close the database and stop any ongoing reattachments
     account.shutdown();
     }
 }

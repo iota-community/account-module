@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-// You should never hard-code a seed
+// The seed that the account uses to generate CDAs and send bundles
 var seed = trinary.Trytes("PUETTSEITFEVEWCWBTSIZM9NKRGJEIMXTULBACGFRQK9IMGICLBKW9TTEVSDQMGWKBXPVCBMMCXWMNPDX")
 
 func main() {
@@ -21,12 +21,14 @@ func main() {
 	iotaAPI, err := api.ComposeAPI(apiSettings)
 	handleErr(err)
 
+	// Define a database in which to store the seed state
 	store, err := badger.NewBadgerStore("seed-state-database")
 	handleErr(err)
 
 	// Make sure the database closes when the code stops
 	defer store.Close()
 
+	// Use the Google NTP servers as a reliable source of time to check CDA timeouts
 	timesource := timesrc.NewNTPTimeSource("time.google.com")
 
 	account, err := builder.NewBuilder().

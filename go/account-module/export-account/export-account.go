@@ -11,7 +11,7 @@ import (
 	"github.com/iotaledger/iota.go/api"
 )
 
-// You should never hard-code a seed
+// The seed that the account uses to generate CDAs and send bundles
 var seed = "PUETTSEITFEVEWCWBTSIZM9NKRGJEIMXTULBACGFRQK9IMGICLBKW9TTEVSDQMGWKBXPVCBMMCXWMNPDX"
 
 func main() {
@@ -24,13 +24,14 @@ func main() {
 	handleErr(err)
 	fmt.Println("Connected to a Devnet node: " + nodeInfo.AppName)
 
+	// Define a database in which to store the seed state
 	store, err := badger.NewBadgerStore("seed-state-database")
 	handleErr(err)
 
 	// Make sure the database closes when the code stops
 	defer store.Close()
 
-	// Create an accurate time source (in this case Google's NTP server).
+	// Use the Google NTP servers as a reliable source of time to check CDA timeouts
 	timesource := timesrc.NewNTPTimeSource("time.google.com")
 
 	account, err := builder.NewBuilder().
@@ -52,6 +53,7 @@ func main() {
 	// Make sure the account shuts down when the code stops
 	defer account.Shutdown()
 
+	// Create a file to which to save the exported seed state
 	f, err := os.OpenFile("exported-seed-state.json", os.O_CREATE, 0755)
 	handleErr(err)
 
