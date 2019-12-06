@@ -1,5 +1,11 @@
 package com.iota;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import org.iota.jota.IotaAPI;
 import org.iota.jota.IotaAccount;
 import org.iota.jota.account.AccountStore;
@@ -7,51 +13,43 @@ import org.iota.jota.account.ExportedAccountState;
 import org.iota.jota.account.store.AccountFileStore;
 import org.iota.jota.error.ArgumentException;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 class ExportAccount {
     public static void main(String[] args) throws ArgumentException, IOException {
+        // Connect to a node
+        IotaAPI api = new IotaAPI.Builder()
+                .protocol("https")
+                .host("nodes.devnet.thetangle.org")
+                .port(443)
+                .build();
 
-    // Connect to a node
-    IotaAPI api = new IotaAPI.Builder()
-        .protocol("https")
-        .host("nodes.devnet.thetangle.org")
-        .port(443)
-        .build();
+        // The seed that the account uses to generate CDAs and send bundles
+        String mySeed = "PUEOTSEITFEVEWCWBTSIZM9NKRGJEIMXTULBACGFRQK9IMGICLBKW9TTEVSDQMGWKBXPVCBMMCXWMNPDX";
 
-    // The seed that the account uses to generate CDAs and send bundles
-    String mySeed = "PUEOTSEITFEVEWCWBTSIZM9NKRGJEIMXTULBACGFRQK9IMGICLBKW9TTEVSDQMGWKBXPVCBMMCXWMNPDX";
-    
-    // Create a file to store the seed state
-    File file = new File("seed-state-database.json");
-    AccountStore store = new AccountFileStore(file);
-    
-    // Create an account
-    IotaAccount account = new IotaAccount.Builder(mySeed)
-    .store(store)
-    .api(api)
-    .build();
+        // Create a file to store the seed state
+        File file = new File("seed-state-database.json");
+        AccountStore store = new AccountFileStore(file);
 
-    // Start the account and any plugins
-    account.start();
+        // Create an account
+        IotaAccount account = new IotaAccount.Builder(mySeed)
+                .store(store)
+                .api(api)
+                .build();
 
-    /*
-    
-    // Create a file to which to save the exported seed state
-    BufferedWriter writer = new BufferedWriter(new FileWriter("exported-seed-state-database.json"));
-    
-    // Export the seed state
-    ExportedAccountState state = store.exportAccount(account.getId());
+        // Start the account and any plugins
+        account.start();
 
-    ObjectMapper mapper = new ObjectMapper();
-         try {
+        // Create a file to which to save the exported seed state
+        BufferedWriter writer = new BufferedWriter(new FileWriter("exported-seed-state-database.json"));
+
+        // Export the seed state
+        ExportedAccountState state = store.exportAccount(account.getId());
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
 
             // Serialize the seed state as JSON
             String json = mapper.writeValueAsString(state);
@@ -60,34 +58,32 @@ class ExportAccount {
             // Write the seed state to the JSON file
             writer.write(json);
             writer.close();
-         } catch (JsonProcessingException e) {
-             e.printStackTrace();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
 
             // Close the database and stop any ongoing reattachments
-             account.shutdown();
-    }
-    */
+            account.shutdown();
+        }
 
-    ObjectMapper mapper = new ObjectMapper();
-         try {
+        mapper = new ObjectMapper();
+        // Ignore new fields
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        
+        try {
 
             FileReader readState = new FileReader("exported-seed-state-database.json");
 
-            ExportedAccountState state = mapper.readValue(readState, ExportedAccountState.class);
+            state = mapper.readValue(readState, ExportedAccountState.class);
 
             store.importAccount(state);
 
             System.out.println("Seed state imported");
-         } catch (JsonProcessingException e) {
-             e.printStackTrace();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
 
-            // Close the database and stop any ongoing reattachments
-             account.shutdown();
-    }
-
-    // Close the database and stop any ongoing reattachments
-    account.shutdown();
-    
+        System.out.println(account);
+        // Close the database and stop any ongoing reattachments
+        account.shutdown();
     }
 }
-
