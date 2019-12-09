@@ -29,11 +29,18 @@ class CreatePluginAccount {
         // Create a new instance of your plugin
         Plugin myPlugin = new TestPlugin();
     
-        // Create an account
+        // Create an account, using your seed
         IotaAccount account = new IotaAccount.Builder(mySeed)
-            .store(store)
-            .plugin(myPlugin)
+            // Connect to a node
             .api(api)
+            // Connect to the database
+            .store(store)
+            // Set the minimum weight magnitude for the Devnet (default is 14)
+            .mwm(9)
+            // Set a security level for CDAs (default is 3)
+            .securityLevel(2)
+            // Load your custom plugin
+            .plugin(myPlugin)
             .build();
     
         // Start the account and any plugins
