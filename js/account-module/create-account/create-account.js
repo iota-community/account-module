@@ -22,7 +22,7 @@ const delay = 1000 * 30;
 const maxDepth = 6;
 
 // Use the Google NTP servers as a reliable source of time to check CDA timeouts
-const timeSource = () => util.promisify(ntpClient.getNetworkTime)("time.google.com");
+const timeSource = () => util.promisify(ntpClient.getNetworkTime)("time.google.com", 123);
 
 // Create an account
 const account = createAccount({

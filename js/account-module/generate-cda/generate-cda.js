@@ -4,7 +4,7 @@ const ntpClient = require('ntp-client');
 const util = require('util');
 
 // The seed that the account uses to generate CDAs and send bundles
-const seed = 'PUEOTSEITFEVEWCWBTSIZM9NKRGJEIMXTULBACGFRQK9IMGICLBKW9TTEVSDQMGWKBXPVCBMMCXWMNPDX';
+const seed = 'PUETTSEITFEVEWCTBTSIZM9NKRGJEIMXTULBACGFRQK9IMGICLBKW9TTEVSDQMGWKBXPVCBMMCXWMNPDX';
 
 // The node to connect to
 const provider = 'https://nodes.devnet.iota.org:443';
@@ -23,7 +23,7 @@ const delay = 1000 * 30;
 const maxDepth = 6;
 
 // Use the Google NTP servers as a reliable source of time to check CDA timeouts
-const timeSource = () => util.promisify(ntpClient.getNetworkTime)("time.google.com");
+const timeSource = () => util.promisify(ntpClient.getNetworkTime)("time.google.com", 123);
 
 // Create an account
 const account = createAccount({
@@ -36,15 +36,16 @@ const account = createAccount({
     timeSource
 });
 
-timeSource().then((time => account.generateCDA({
+timeSource().then((time => {
+        account.generateCDA({
         // Set the CDA to expire tomorrow
-        timeoutAt: time + 24 * 60 * 60 * 1000,
+        timeoutAt: time.getTime() + 24 * 60 * 60 * 1000
     }).then(cda => {
         const magnetLink = CDA.serializeCDAMagnet(cda);
         console.log(magnetLink);
     }).catch(error => {
-    console.log(error);
-    // Close the database and stop any ongoing reattachments
-    account.stop();
-})));
+        console.log(error);
+        // Close the database and stop any ongoing reattachments
+        account.stop();
+})}));
 

@@ -2,7 +2,7 @@ const { createAccount }  = require('@iota/account');
 const TransactionConverter  = require('@iota/transaction-converter');
 
 // The seed that the account uses to generate CDAs and send bundles
-const seed = 'PUEOTSEITFEVEWCWBTSIZM9NKRGJEIMXTULBACGFRQK9IMGICLBKW9TTEVSDQMGWKBXPVCBMMCXWMNPDX';
+const seed = 'PUETTSEITFEVEWCTBTSIZM9NKRGJEIMXTULBACGFRQK9IMGICLBKW9TTEVSDQMGWKBXPVCBMMCXWMNPDX';
 
 // The node to connect to
 const provider = 'https://nodes.devnet.iota.org:443';
