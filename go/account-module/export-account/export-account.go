@@ -37,10 +37,10 @@ func main() {
 	account, err := builder.NewBuilder().
 		// Connect to a node
 		WithAPI(iotaAPI).
-		// Create the database
+		// Connect to the database
 		WithStore(store).
 		WithSeed(seed).
-		// Set the minimum weight magnitude for the Devnet
+		// Set the minimum weight magnitude for the Devnet (default is 14)
 		WithMWM(9).
 		WithTimeSource(timesource).
 		// Load the default plugins that enhance the functionality of the account
