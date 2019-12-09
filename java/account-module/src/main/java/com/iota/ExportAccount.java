@@ -33,11 +33,17 @@ class ExportAccount {
         File file = new File("seed-state-database.json");
         AccountStore store = new AccountFileStore(file);
 
-        // Create an account
+        // Create an account, using your seed
         IotaAccount account = new IotaAccount.Builder(mySeed)
-                .store(store)
-                .api(api)
-                .build();
+            // Connect to a node
+            .api(api)
+            // Connect to the database
+            .store(store)
+            // Set the minimum weight magnitude for the Devnet (default is 14)
+            .mwm(9)
+            // Set a security level for CDAs (default is 3)
+            .securityLevel(2)
+            .build();
 
         // Start the account and any plugins
         account.start();
@@ -64,7 +70,7 @@ class ExportAccount {
             // Close the database and stop any ongoing reattachments
             account.shutdown();
         }
-
+        
         mapper = new ObjectMapper();
         // Ignore new fields
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -81,7 +87,7 @@ class ExportAccount {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-
+        
         System.out.println(account);
         // Close the database and stop any ongoing reattachments
         account.shutdown();
