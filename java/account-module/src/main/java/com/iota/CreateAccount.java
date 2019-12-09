@@ -21,7 +21,7 @@ class CreateAccount {
             .build();
     
         // The seed that the account uses to generate CDAs and send bundles
-        String mySeed = "PUEOTSEITFEVEWCWBTSIZM9NKRGJEIMXTULBACGFRQK9IMGICLBKW9TTEVSDQMGWKBXPVCBMMCXWMNPDX";
+        String mySeed = "PUETTSEITFEVEWCTBTSIZM9NKRGJEIMXTULBACGPRQK9IMGICLBKW9TTEVSDQMGWKBXPVCBMMCXWMNPDX";
         
         // Create a file to store the seed state
         File file = new File("seed-state-database.json");
