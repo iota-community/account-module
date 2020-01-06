@@ -1,6 +1,6 @@
-# IOTA samples
+# Account module samples
 
-Sample code that we use on the IOTA documentation portal.
+Sample code that we use to document the account module on the IOTA documentation portal.
 
 Use this repository to try sample code and learn how to use IOTA technology with the accompanying [documentation](https://docs.iota.org).
 
